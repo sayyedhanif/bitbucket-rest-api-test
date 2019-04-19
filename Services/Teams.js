@@ -2,16 +2,20 @@ var request = require('request');
 
 const config = require('../config')
 
-class User {
-  static getMe(headers) {
+class Teams {
+  	static getUserTeams(headers, query) {
     return new Promise(async (resolve, reject) => {
+
 			request({
 				method: 'GET',
-				url: 'https://api.bitbucket.org/2.0/user',
-				auth: {
-					"user": headers.username,
-					"pass": headers.password,
+				url: `https://api.bitbucket.org/2.0/teams`,
+				auth : {
+					user: headers.username,
+					pass: headers.password
 				},
+				qs: {
+					role: query.role
+				}
 			}, function (error, response, body) {
 				console.log(error, body)
 				if (error) {
@@ -27,15 +31,16 @@ class User {
 				}
 				if(response.statusCode && response.statusCode >=200 && response.statusCode < 400){
 					
-					resolve({ success: true, message :'user data return successfully!' , data: body, statusCode: 200});
+					resolve({ success: true, message :'Get user team!' , data: body, statusCode: 200});
 				} else if(response.statusCode && response.statusCode == 401 || response.statusCode == 403){
-					reject({ success: false, message :'Authentication error!' , data: {}, statusCode : response.statusCode} );
+					reject({ success: false, message :'Authenticaion error!' , data: {}, statusCode : response.statusCode} );
 				} else {
-					reject({ success: false, message :body.error.message , data: {}, statusCode: response.statusCode});
-				}             
+					reject({ success: false, message :body.error.message, data: {}, statusCode: response.statusCode});
+				}            
 			})
 		});
-  }
+	}
+
 }
 
-module.exports = User;
+module.exports = Teams;
